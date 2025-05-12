@@ -1,0 +1,25 @@
+/* Estilos editados de bootstrap */
+.btn-primary{
+    background-color: var(--color-hover-acento) !important;
+    width: 10rem;
+    font-size: 1.2rem !important;
+    transition: all 1s;
+}
+
+.btn-primary:hover{
+    transform: scale(1.1);
+    color: var(--color-hover-acento) !important;
+    background-color: var(--color-texto) !important;
+}
+
+
+/* Estilos propios */
+.contenedorImgPieza{
+    width: 10rem;
+}
+
+.imgPieza{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}

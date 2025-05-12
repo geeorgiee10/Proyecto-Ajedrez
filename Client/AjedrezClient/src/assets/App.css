@@ -1,0 +1,41 @@
+@import url(./login.css);
+@import url(./landing.css);
+@import url(./header.css);
+@import url(./footer.css);
+@import url(./informacion.css);
+@import url(./jugar.css);
+@import url(./error404.css);
+
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+
+
+:root {
+  --color-fondo: #2E2E2E; /* Fondo principal oscuro */
+  --color-texto: #F0EAD6; /* Texto claro y elegante */
+  --color-tablero-claro: #F0EAD6; /* Casillas claras del tablero */
+  --color-tablero-oscuro: #6789D3; /* Casillas oscuras del tablero */
+  --color-acento: #4A6FA5; /* Detalles o botones destacados */
+  --color-borde: #1B1B1B; /* Bordes o piezas negras */
+
+  --color-hover-acento: #6789D3; /* Color para el hover de botones o detalles */
+  --color-hover-tablero-claro: #E3D1A1; /* Hover para casillas claras */
+  --color-hover-tablero-oscuro: #A38860; /* Hover para casillas oscuras */
+  --color-hover-texto: #F7F0C5; /* Hover sobre texto para mayor énfasis */
+
+  --radio-bordes: 10px;
+  --fuente-ajedrez: 'Press Start 2P', cursive;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+main{
+  flex: 1;
+  height: auto;
+  min-height: 80vh;
+}

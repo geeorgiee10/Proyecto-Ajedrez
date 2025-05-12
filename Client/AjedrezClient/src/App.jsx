@@ -1,34 +1,41 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import './assets/App.css';
+import { Login } from './components/Login.jsx';
+import { Header } from './components/Header.jsx';
+import { Footer } from './components/Footer.jsx';
+import { LandingPage } from './components/LandingPage.jsx';
+import { Informacion } from './components/informacion.jsx';
+import { Jugar } from './components/Jugar.jsx';
+import { Error404 } from './components/Error404.jsx';
+import { RutasProtegidas } from './components/RutasProtegidas.jsx';
+import { RutasLogin } from './components/RutasLogin.jsx';
+import { ScrollTop } from './components/ScrollTop.jsx';
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <BrowserRouter>
+    <Header /> 
+    <ScrollTop />
+       
+      <main>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/informacion" element={<Informacion />} />
+          <Route element={<RutasLogin />}>
+            <Route path="/login" element={<Login />} />
+          </Route>
+          <Route element={<RutasProtegidas />}>
+            <Route path="/jugar" element={<Jugar />} />
+          </Route>
+          <Route path="*" element={<Error404 />} />
+        </Routes>
+      </main>
+      
+    <Footer /> 
+    </BrowserRouter>
   )
 }
 

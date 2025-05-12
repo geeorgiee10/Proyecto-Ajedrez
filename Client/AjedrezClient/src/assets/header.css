@@ -1,0 +1,32 @@
+/* Estilos editados de bootstrap */
+
+.navbar-brand{
+    font-size: 2rem !important;
+}
+
+.navbar-brand:hover{
+    color: var(--color-hover-acento) !important;
+    transform: scale(1.05);
+}
+
+.nav-link{
+    color: var(--color-tablero-claro) !important;
+    font-size: 1.2rem !important;
+    transition: all 1s ease-in;
+}
+
+.nav-link:hover{
+    transform: scale(1.05);
+}
+
+.LinkRouter{
+    text-decoration: none !important;
+}
+
+/* Estilos propios */
+
+.nombreUsuario{
+    color: white !important;
+    font-weight: bolder !important;
+    margin-left: 1.2rem;
+}

@@ -1,0 +1,12 @@
+/* Estilos editados */
+
+
+/* Estilos propios */
+.opcionesJugar{
+    transition: all 0.3s ease;
+}
+
+.opcionesJugar:hover{
+    transform: scale(1.1);
+}
+

@@ -1,0 +1,63 @@
+/*Estilos boostrap modificados*/
+.btn-secondary{
+    background-color: var(--color-acento) !important;
+    transition: all 0.5s ease;
+    width: 10rem;
+    height: 3rem;
+    align-self: center;
+    justify-self: center;
+    font-size: 1.5rem !important;
+}
+
+.btn-secondary:hover{
+    background-color: var(--color-hover-acento) !important;
+    transform: scale(1.1);
+}
+
+.btn-outline-secondary{
+    width: 15rem;
+    height: 3rem;
+    border: 1px solid var(--color-acento) !important;
+    color: var(--color-acento) !important;
+    font-size: 1.2rem !important;
+}
+
+.btn-outline-secondary:hover{
+    border: 1px solid var(--color-texto) !important;
+    background-color: var(--color-acento) !important;
+    color: var(--color-texto) !important;
+}
+
+
+/* Estilos propios*/
+.contenedorImgTablero{
+    width: 100%;
+    height: 100%;
+}
+
+.imgTablero{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.separador{
+    margin: 5rem 0rem;
+    color: var(--color-acento);
+}
+
+.contenedorImgForos{
+    width: 40vw;
+    height: 30%;
+}
+
+.imgForos{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 10%;
+}
+
+.modos{
+    border: 1px solid var(--color-acento) ;
+}

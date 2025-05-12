@@ -1,0 +1,17 @@
+/* Estilos editados */
+
+
+/* Estilos propios */
+.informacion_card{
+    width: 20rem;
+    height: 22rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+.informacion_card:hover{
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
