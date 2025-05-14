@@ -39,3 +39,7 @@ main{
   height: auto;
   min-height: 80vh;
 }
+
+.ejemplo{
+  background-color: #6789D3;
+}

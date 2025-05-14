@@ -80,8 +80,10 @@ export function Login() {
                   amigoID: [],
                   avatar: 'rutaImagenDefectoServidor', 
                   estadísticas: {
+                    calidad_promedio_movimientos: 0,
                     partidas_ganadas: 0, 
                     partidas_perdidas: 0, 
+                    partidas_empatadas: 0, 
                     ranking: null, 
                   },
                   nombre_email: auth.currentUser.displayName || auth.currentUser.email, 
