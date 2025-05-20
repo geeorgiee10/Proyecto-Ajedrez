@@ -24,7 +24,7 @@ export function RutasProtegidas() {
 
     return (
         
-      iniciado ? <Outlet /> : <Navigate to='/'/>
+      iniciado ? <Outlet /> : <Navigate to='/login'/>
         
     )
 }

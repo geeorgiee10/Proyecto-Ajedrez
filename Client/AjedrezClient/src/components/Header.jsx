@@ -1,10 +1,11 @@
 import { useState,useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Link } from "react-router";
+import { NavLink, useNavigate } from 'react-router-dom';
 import { auth } from '../../firebase';
 import { onAuthStateChanged, signOut  } from 'firebase/auth';
 
 export function Header() {
-
+  const navigate = useNavigate();
   const [estaIniciado, setEstaIniciado] = useState(false);
   const [nombreUsuario, setNombreUsuario] = useState('');
 
@@ -27,6 +28,7 @@ export function Header() {
     try {
       await signOut(auth); 
       console.log("Sesión cerrada");
+      navigate("/")
     } 
     catch (error) {
       console.error("Error al cerrar sesión:", error);
@@ -53,13 +55,13 @@ export function Header() {
                 </li>
               </Link>
 
-              {estaIniciado && (
-                  <Link className="LinkRouter" to="/jugar">
-                    <li className="nav-item">
-                      <span className="nav-link">Jugar</span>
-                    </li>
-                  </Link>
-              )} 
+              
+              <Link className="LinkRouter" to="/jugar">
+                <li className="nav-item">
+                  <span className="nav-link">Jugar</span>
+                </li>
+              </Link>
+              
 
               {estaIniciado && (
                   <Link className="LinkRouter" to="/">

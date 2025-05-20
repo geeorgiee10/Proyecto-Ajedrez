@@ -1,11 +1,11 @@
-import { BrowserRouter, Routes, Route, Link } from "react-router";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Chess } from 'chess.js';
 import { Chessboard } from 'react-chessboard';
+import createStockfish from '../utils/createStockfish';
 
-export function ModoLocal() {
-    const [chess, setChess] = useState(new Chess());
-    const [fen,setFen] = useState(chess.fen());
+export function ModoIA() {
+    const chessRef = useRef(new Chess());
+    const [fen,setFen] = useState(chessRef.current.fen());
     const [capturadas, setCapturadas] = useState([]);
     const [cronometroBlancas, setCronometroBlancas] = useState(300);
     const [cronometroNegras, setCronometroNegras] = useState(300);
@@ -13,14 +13,75 @@ export function ModoLocal() {
     const [estado, setEstado] = useState('');
     const [terminada, setTerminada] = useState(false);
 
+    const stockfish = useRef(null);
+    const stockfishReady = useRef(false);
 
-    const hacerMovimiento = (cuadradoOrigen, cuadradoDestino) => {
+
+
+    useEffect(() => {
+        const sf = createStockfish();
+        stockfish.current = sf;
+
+        sf.onmessage = (evento) => {
+            const mensaje = evento.data || evento;
+
+            if (mensaje === 'readyok') {
+                stockfishReady.current = true;
+                if (turno === 'b' && !terminada) {
+                    sf.postMessage(`position fen ${fen}`);
+                    sf.postMessage('go depth 10');
+                }
+            }
+
+            if (typeof mensaje === 'string' && mensaje.startsWith('bestmove')) {
+                const movimiento = mensaje.split(' ')[1];
+                if (movimiento) {
+                    hacerMovimiento(movimiento.slice(0, 2), movimiento.slice(2, 4), true);
+                }
+            }
+        };
+
+        sf.postMessage('uci');
+        sf.postMessage('ucinewgame');
+        sf.postMessage('isready');
+
+        return () => {
+            sf.terminate?.(); 
+        }
+    }, []);
+
+    useEffect(() => {
+
+        if (turno === 'b' && !terminada && stockfishReady.current) {
+            stockfish.current.postMessage(`position fen ${fen}`);
+            stockfish.current.postMessage('go depth 10');
+        }
+
+    }, [turno, fen, terminada]);
+
+
+    const hacerMovimiento = (cuadradoOrigen, cuadradoDestino, ia = false) => {
 
         if(terminada){
             return false;
         }
 
-        const movimiento = chess.move({
+        const nuevoChess = new Chess(chessRef.current.fen());
+
+        const pieza = nuevoChess.get(cuadradoOrigen);
+        if(!pieza){
+            return false;
+        }
+
+        if(!ia && (pieza.color !== 'w' || nuevoChess.turn() !== 'w')){
+            return false;
+        }
+
+        if (ia && (pieza.color !== 'b' || nuevoChess.turn() !== 'b')) {
+            return false;
+        }
+
+        const movimiento = nuevoChess.move({
             from: cuadradoOrigen,
             to: cuadradoDestino,
             promotion: 'q'
@@ -28,26 +89,28 @@ export function ModoLocal() {
 
         if(movimiento){
             if(movimiento.captured){
-                setCapturadas([...capturadas, { color: movimiento.color === 'w' ? 'b' : 'w', piece: movimiento.captured}]);
+                setCapturadas(prev => [...prev, { color: movimiento.color === 'w' ? 'b' : 'w', piece: movimiento.captured }]);
             }
 
-            setFen(chess.fen());
+            chessRef.current = nuevoChess;
+            setFen(nuevoChess.fen());
+            setTurno(nuevoChess.turn());
 
-            setTurno(movimiento.color === 'w' ? 'b' : 'w');
+            setTurno(nuevoChess.turn());
 
-            if(chess.isCheckmate()){
+            if(nuevoChess.isCheckmate()){
                 setTerminada(true);
                 setEstado('¡Jaque Mate! Han ganado las ' + (movimiento.color === 'w' ? 'blancas' : 'negras') + '.');
             }
-            else if(chess.isStalemate()){
+            else if(nuevoChess.isStalemate()){
                 setTerminada(true);
                 setEstado('¡Empate por falta de movimientos!');
             }
-            else if(chess.isDraw()){
+            else if(nuevoChess.isDraw()){
                 setTerminada(true);
                 setEstado('La partida ha quedado en tablas!');
             }
-            else if(chess.isCheck()){
+            else if(nuevoChess.isCheck()){
                 setEstado('¡Jaque a las piezas ' + (movimiento.color === 'w' ? 'negras' : 'blancas') + '.');
             }
             else{
@@ -107,7 +170,7 @@ export function ModoLocal() {
 
     const volverAEmpezar = () => {
         const empezarDeNuevo = new Chess();
-        setChess(empezarDeNuevo);
+        chessRef.current = empezarDeNuevo;
         setFen(empezarDeNuevo.fen());
         setCapturadas([]);
         setCronometroBlancas(300);
@@ -131,7 +194,7 @@ export function ModoLocal() {
             }
 
             const partida = new Chess(datos.fen);
-            setChess(partida);
+            chessRef.current = partida;
             setFen(datos.fen);
             setCapturadas(datos.capturadas || []);
             setCronometroBlancas(datos.cronometroBlancas);
@@ -169,9 +232,10 @@ export function ModoLocal() {
        <div className="container py-5 d-flex flex-column">
 
             <div className="text-center mb-4">
-                <h2 className="text-primary">{estado}</h2>
+                <h2 className="textoPrimario">{estado}</h2>
 
-                <h3 className="text-secondary">Turno de las piezas {turno === 'w' ? 'blancas' : 'negras'}</h3>
+                <h3 className="textoSecundario">Turno de las piezas {turno === 'w' ? 'blancas' : 'negras'}</h3>
+                <h3 className="textoTerciario">Controlas a las piezas blancas</h3>
             </div>
 
             <div className="row justify-content-center">
@@ -197,7 +261,14 @@ export function ModoLocal() {
                                 
                                 customDarkSquareStyle={{ backgroundColor: '#6789D3' }}
                                 customLightSquareStyle={{ backgroundColor: '#F0EAD6' }}
-                                onPieceDrop={(origen, destino) => hacerMovimiento(origen, destino)}
+                                onPieceDrop={(origen, destino) => {
+                                    const pieza = chessRef.current.get(origen);
+                                    if (!pieza || pieza.color !== 'w' || chessRef.current.turn() !== 'w') {
+                                        return false;
+                                    }
+                                    return hacerMovimiento(origen, destino, false);
+                                }
+                            }
                             />
 
 
@@ -225,7 +296,7 @@ export function ModoLocal() {
 
             
             <div className="text-center mt-4">
-                <button className='btn btn-outline-primary btn-lg' onClick={volverAEmpezar}>Reiniciar partida</button>
+                <button className='btn btn-outline-secondary btn-lg' onClick={volverAEmpezar}>Reiniciar partida</button>
             </div>
             
 

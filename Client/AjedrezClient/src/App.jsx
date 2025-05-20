@@ -6,7 +6,8 @@ import { Footer } from './components/Footer.jsx';
 import { LandingPage } from './components/LandingPage.jsx';
 import { Informacion } from './components/informacion.jsx';
 import { Jugar } from './components/Jugar.jsx';
-import { ModoLocal }from './components/ModoLocal.jsx'
+import { ModoLocal }from './components/ModoLocal.jsx';
+import { ModoIA } from './components/ModoIA.jsx';
 import { Error404 } from './components/Error404.jsx';
 import { RutasProtegidas } from './components/RutasProtegidas.jsx';
 import { RutasLogin } from './components/RutasLogin.jsx';
@@ -28,12 +29,11 @@ function App() {
           <Route element={<RutasLogin />}>
             <Route path="/login" element={<Login />} />
           </Route>
+          <Route path="/jugar" element={<Jugar />} />
           <Route element={<RutasProtegidas />}>
-            <Route path="/jugar" element={<Jugar />} />
+            <Route path="/modo-ia" element={<ModoIA />} />
           </Route>
-          <Route element={<RutasProtegidas />}>
-            <Route path="/modo-local" element={<ModoLocal />} />
-          </Route>
+          <Route path="/modo-local" element={<ModoLocal />} />
           <Route path="*" element={<Error404 />} />
         </Routes>
       </main>

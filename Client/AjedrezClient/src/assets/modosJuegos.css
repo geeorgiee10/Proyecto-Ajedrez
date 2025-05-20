@@ -1,0 +1,43 @@
+.textoPrimario{
+    color: var(--color-fondo) !important; 
+    font-weight: 700;
+    font-size: 1.7rem;
+}
+
+.textoSecundario{
+    color: var(--color-acento);
+    font-weight: 500;
+    font-size: 1.5rem;
+}
+
+.textoTerciario{
+    color: var(--color-secundario);
+    font-size: 1.2rem;
+    font-style: italic;
+}
+
+.card{
+    background-color: var(--color-hover-tablero-oscuro, #fff);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    padding: 1rem;
+    transition: all 0.2s ease;
+}
+
+.card:hover {
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+}
+
+.card-header{
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid var(--color-acento) !important;
+    padding-bottom: 0.5rem;
+    color: var(--color-acento);
+}
+
+.card-body{
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
