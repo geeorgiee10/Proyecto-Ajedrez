@@ -10,7 +10,7 @@ export function Jugar() {
           <h2 className="fw-bold mb-5 text-center">Modos de juego</h2>
           <div className="row text-center mb-5 d-flex align-items-center justify-content-center">
           {[
-            { title: "Modo IA", description: "Juega contra la máquina, elige tu nivel", icon: "robot", path: "/modo-ia" },
+            { title: "Modo IA", description: "Juega partidas contra la máquina", icon: "robot", path: "/modo-ia" },
             { title: "Modo local", description: "Dos jugadores en un solo dispositivo", icon: "people", path: "/modo-local" },
             { title: "Modo online", description: "Desafía a jugadores de todo el mundo", icon: "globe", path: "/modo-online" },
           ].map((mode, i) => (

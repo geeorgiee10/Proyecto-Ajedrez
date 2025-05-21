@@ -85,7 +85,7 @@ export function ModoOnline() {
         <div className="container py-5 text-center d-flex flex-column">
             {esperandoJugador ? (
                 <>
-                    <div className='d-flex flex-column gap-3 align-items-center'>
+                    <div className='d-flex flex-column gap-3 align-items-center buscandoPartida'>
                         <div className="spinner-border text-primary mb-3" role="status">
                             <span className="visually-hidden">Cargando...</span>
                         </div>
