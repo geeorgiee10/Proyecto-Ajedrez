@@ -2,8 +2,12 @@ import { useState, useEffect, useRef } from 'react';
 import { Chess } from 'chess.js';
 import { Chessboard } from 'react-chessboard';
 import createStockfish from '../utils/createStockfish';
+import { useNavigate } from 'react-router-dom';
+
 
 export function ModoIA() {
+    const navigate = useNavigate();
+
     const chessRef = useRef(new Chess());
     const [fen,setFen] = useState(chessRef.current.fen());
     const [capturadas, setCapturadas] = useState([]);
@@ -295,9 +299,17 @@ export function ModoIA() {
             </div>
 
             
-            <div className="text-center mt-4">
+            <div className="d-flex flex-column align-items-center gap-3 text-center mt-4">
                 <button className='btn btn-outline-secondary btn-lg' onClick={volverAEmpezar}>Reiniciar partida</button>
+
+                 {terminada  && (
+                        <button className="btn btn-outline-secondary btn-lg" onClick={() => navigate('/jugar')}>
+                            Volver a jugar
+                        </button>
+                    )}
             </div>
+
+           
             
 
        </div>

@@ -38,7 +38,7 @@ html, body {
 main{
   flex: 1;
   height: auto;
-  min-height: 80vh;
+  min-height: 85vh;
 }
 
 .ejemplo{

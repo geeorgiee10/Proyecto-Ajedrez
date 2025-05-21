@@ -2,8 +2,12 @@ import { BrowserRouter, Routes, Route, Link } from "react-router";
 import { useState, useEffect } from 'react';
 import { Chess } from 'chess.js';
 import { Chessboard } from 'react-chessboard';
+import { useNavigate } from 'react-router-dom';
 
 export function ModoLocal() {
+    const navigate = useNavigate();
+
+
     const [chess, setChess] = useState(new Chess());
     const [fen,setFen] = useState(chess.fen());
     const [capturadas, setCapturadas] = useState([]);
@@ -224,8 +228,14 @@ export function ModoLocal() {
             </div>
 
             
-            <div className="text-center mt-4">
-                <button className='btn btn-outline-primary btn-lg' onClick={volverAEmpezar}>Reiniciar partida</button>
+            <div className="d-flex flex-column align-items-center gap-3 text-center mt-4">
+                <button className='btn btn-outline-secondary btn-lg' onClick={volverAEmpezar}>Reiniciar partida</button>
+
+                 {terminada  && (
+                        <button className="btn btn-outline-secondary btn-lg" onClick={() => navigate('/jugar')}>
+                            Volver a jugar
+                        </button>
+                    )}
             </div>
             
 

@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Link } from "react-router";
+import { Link } from "react-router";
 
 
 export function Informacion() {
@@ -15,7 +15,7 @@ export function Informacion() {
             <div className="row justify-content-center mb-5">
                 {[
                     { title: "Resgístrate", description: "Crea tu cuenta, personaliza tu perfil y comienza a ganar recompensas.", icon: "person-plus" },
-                    { title: "Juega", description: "Disfruta de partidas contra la máquina, jugadores online o desafía a tus amigos en el mismo dispositivo.", icon: "grid-3x3-gap" },
+                    { title: "Juega", description: "Disfruta de partidas contra la máquina, online o desafía a tus amigos en el mismo dispositivo.", icon: "grid-3x3-gap" },
                     { title: "Ranking", description: "Gana partidas y asciende en el ranking hasta alcanzar el primer lugar.", icon: "globe" },
                     { title: "Foros", description: "Únete a las conversaciones en tiempo real sobre estrategias, tácticas y mucho más.", icon: "chat-left-text" },
                 ].map((mode, i) => (
