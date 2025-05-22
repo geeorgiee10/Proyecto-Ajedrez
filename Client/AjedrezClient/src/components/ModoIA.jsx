@@ -16,6 +16,8 @@ export function ModoIA() {
     const [turno, setTurno] = useState('w');
     const [estado, setEstado] = useState('');
     const [terminada, setTerminada] = useState(false);
+    const [dificultad, setDificultad] = useState(10);
+    const [dificultadSeleccionada, setDificultadSeleccionada] = useState(false);
 
     const stockfish = useRef(null);
     const stockfishReady = useRef(false);
@@ -33,7 +35,7 @@ export function ModoIA() {
                 stockfishReady.current = true;
                 if (turno === 'b' && !terminada) {
                     sf.postMessage(`position fen ${fen}`);
-                    sf.postMessage('go depth 10');
+                    sf.postMessage(`go depth ${dificultad}`);
                 }
             }
 
@@ -52,16 +54,16 @@ export function ModoIA() {
         return () => {
             sf.terminate?.(); 
         }
-    }, []);
+    }, [dificultadSeleccionada, dificultad]);
 
     useEffect(() => {
 
         if (turno === 'b' && !terminada && stockfishReady.current) {
             stockfish.current.postMessage(`position fen ${fen}`);
-            stockfish.current.postMessage('go depth 10');
+            stockfish.current.postMessage(`go depth ${dificultad}`);
         }
 
-    }, [turno, fen, terminada]);
+    }, [turno, fen, terminada, dificultad]);
 
 
     const hacerMovimiento = (cuadradoOrigen, cuadradoDestino, ia = false) => {
@@ -185,7 +187,7 @@ export function ModoIA() {
     }
 
     useEffect(() =>{
-        const partidaGuardada = localStorage.getItem('partidaAjedrezLocal');
+        const partidaGuardada = localStorage.getItem('partidaAjedrezIA');
 
         if(partidaGuardada){
             const datos = JSON.parse(partidaGuardada);
@@ -193,7 +195,7 @@ export function ModoIA() {
             const hora = 60 * 60 * 1000;
 
             if (ahora - datos.timestamp > hora) {
-                localStorage.removeItem('partidaAjedrezLocal');
+                localStorage.removeItem('partidaAjedrezIA');
                 return;
             }
 
@@ -206,12 +208,13 @@ export function ModoIA() {
             setTurno(datos.turno);
             setTerminada(false);
             setEstado('');
+            setDificultadSeleccionada(true);
         }
     }, []);
 
     useEffect(() => {
         if (terminada) {
-            localStorage.removeItem("partidaAjedrezLocal");
+            localStorage.removeItem("partidaAjedrezIA");
         }
     }, [terminada]);
 
@@ -225,16 +228,52 @@ export function ModoIA() {
                 turno,
                 timestamp: Date.now()
             };
-            localStorage.setItem('partidaAjedrezLocal', JSON.stringify(datosPartida));
+            localStorage.setItem('partidaAjedrezIA', JSON.stringify(datosPartida));
         }
     }, [fen, capturadas, cronometroBlancas, cronometroNegras, turno, terminada])
 
      
     return (
-      <>
+      
         
        <div className="container py-5 d-flex flex-column">
+        {!dificultadSeleccionada ? (
+                <div className="d-flex flex-column align-items-center gap-3 dificultadIA">
+                    <h3>Selecciona el nivel de dificultad</h3>
+                    <div className='d-flex align-items-center gap-2'>
+                    <button
+                        className={`btn btn-outline-secondary ${dificultad === 2 ? 'active' : ''}`}
+                        onClick={() => setDificultad(2)}
+                    >
+                        Fácil
+                    </button>
+                    <button
+                        className={`btn btn-outline-secondary ${dificultad === 5 ? 'active' : ''}`}
+                        onClick={() => setDificultad(5)}
+                    >
+                        Media
+                    </button>
+                    <button
+                        className={`btn btn-outline-secondary ${dificultad === 10 ? 'active' : ''}`}
+                        onClick={() => setDificultad(10)}
+                    >
+                        Difícil 
+                    </button>
+                    <button
+                        className={`btn btn-outline-secondary ${dificultad === 15 ? 'active' : ''}`}
+                        onClick={() => setDificultad(15)}
+                    >
+                        Muy difícil
+                    </button>
 
+                    </div>
+
+                    <button className="btn btn-primary mt-3" onClick={() => setDificultadSeleccionada(true)}>
+                        Empezar
+                    </button>
+                </div>
+        ) : (
+                <>
             <div className="text-center mb-4">
                 <h2 className="textoPrimario">{estado}</h2>
 
@@ -302,7 +341,7 @@ export function ModoIA() {
             <div className="d-flex flex-column align-items-center gap-3 text-center mt-4">
                 <button className='btn btn-outline-secondary btn-lg' onClick={volverAEmpezar}>Reiniciar partida</button>
 
-                 {terminada  && (
+                    {terminada  && (
                         <button className="btn btn-outline-secondary btn-lg" onClick={() => navigate('/jugar')}>
                             Volver a jugar
                         </button>
@@ -310,13 +349,10 @@ export function ModoIA() {
             </div>
 
            
-            
-
+            </>
+        )}
        </div>
-  
-  
-      </>
-    )
+    );
   }
   
   

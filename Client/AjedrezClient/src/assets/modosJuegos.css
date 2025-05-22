@@ -48,3 +48,9 @@
     height: 40vh;
     /* background-color: aqua; */
 }
+
+.dificultadIA{
+    align-items: center;
+    justify-content: flex-end;
+    height: 40vh;
+}

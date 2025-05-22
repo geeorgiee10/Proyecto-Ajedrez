@@ -22,6 +22,11 @@
     font-size: 1.2rem !important;
 }
 
+.btn-outline-secondary.active{
+    background-color: var(--color-acento) !important;
+    color: white !important;
+}
+
 .btn-outline-secondary:hover{
     border: 1px solid var(--color-texto) !important;
     background-color: var(--color-acento) !important;
