@@ -17,6 +17,8 @@ export function ModoOnline() {
     const [esperandoJugador, setEsperandoJugador] = useState(true);
     const [capturadas, setCapturadas] = useState([]);
     const [cronometro, setCronometro] = useState({ w: 300, b: 300});
+    const [jugadores, setJugadores] = useState([]);
+
 
 
     useEffect(() => {
@@ -37,10 +39,15 @@ export function ModoOnline() {
 
         socket.emit('unirsePartida', { userId });
 
+        socket.on('jugadoresActualizados', (players) => {
+            setJugadores(players);
+            console.log(jugadores);
+        });
+
         socket.on('colorAsignado', (color) => setJugadorColor(color));
 
         socket.on('partidaIniciada', () => {
-            setEsperandoJugador(false); // ✅ Ahora sí iniciamos
+            setEsperandoJugador(false); 
         });
 
         socket.on('estadoPartida', ({ fen, turno, estado, capturadas, cronometro }) => {
@@ -81,6 +88,9 @@ export function ModoOnline() {
         navigate('/jugar');
     };
 
+    const jugadorBlancas = jugadores.find(j => j.color === 'w');
+    const jugadorNegras = jugadores.find(j => j.color === 'b');
+
     return (
         <div className="container py-5 text-center d-flex flex-column">
             {esperandoJugador ? (
@@ -106,13 +116,31 @@ export function ModoOnline() {
                                 <div className="card-body text-center">
                                     <div className="d-flex justify-content-around mb-3">
                                         <div>
-                                            <h5>Piezas blancas</h5>
+                                            {jugadorBlancas && (
+                                                <>
+                                                    <img
+                                                        src={jugadorBlancas.avatar}
+                                                        alt={`Avatar de ${jugadorBlancas.nombre_email || 'Jugador'}`}
+                                                        className="rounded-circle"
+                                                    />
+                                                    <h5>{jugadorBlancas.nombre_email || 'Jugador'}</h5>
+                                                </>
+                                            )}
                                             <span className="badge bg-light text-dark fs-5">
                                                 {formCronometro(cronometro.w)}
                                             </span>
                                         </div>
                                         <div>
-                                            <h5>Piezas negras</h5>
+                                            {jugadorNegras && (
+                                                <>
+                                                    <img
+                                                        src={jugadorNegras.avatar}
+                                                        alt={`Avatar de ${jugadorNegras.nombre_email}`}
+                                                        className="rounded-circle"
+                                                    />
+                                                    <h5>{jugadorNegras.nombre_email}</h5>
+                                                </>
+                                            )}
                                             <span className="badge bg-dark fs-5">
                                                 {formCronometro(cronometro.b)}
                                             </span>

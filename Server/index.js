@@ -1,3 +1,5 @@
+const { dbAdmin } = require('./firebaseAdmin');
+
 const express = require('express');
 const path = require('path');
 const port = process.env.PORT || 2908;
@@ -32,10 +34,26 @@ io.on('connection', (socket) => {
   let userId = null;
 
   console.log(`Nuevo usuario conectado: ${socket.id}`);
-
-  socket.on('unirsePartida', ({ userId: id }) => {
+  
+  socket.on('unirsePartida', async  ({ userId: id }) => {
     userId = id || socket.id;
-    console.log(`Jugador con ID ${userId || socket.id} se ha unido`);
+
+    let nombre_email;
+    let avatar;
+
+    try {
+      const consulta = await dbAdmin.collection('usurios').where('usuarioID', '==', userId).get();
+              
+
+      if (!consulta.empty) {
+        const userDoc = consulta.docs[0]; 
+        const userData = userDoc.data();
+        nombre_email = userData.nombre_email || 'Jugador';
+        avatar = userData.avatar || 'https://via.placeholder.com/100';
+      }
+    } catch (error) {
+      console.error('Error al obtener datos de usuario:', error);
+    }
 
     // Buscar partida con espacio
     let room = Object.keys(partidas).find(id => partidas[id].players.length < 2);
@@ -55,14 +73,17 @@ io.on('connection', (socket) => {
     const partida = partidas[roomId]; 
 
     color = partida.players.length === 0 ? 'w' : 'b';
-    partida.players.push({ id: userId || socket.id, color });
+    partida.players.push({ id: userId || socket.id, color, nombre_email, avatar });
 
     socket.join(roomId);
     socket.emit('colorAsignado', color);
 
+    io.to(roomId).emit('jugadoresActualizados', partida.players);
+
+
     if (partida.players.length === 2) {
         io.to(roomId).emit('partidaIniciada');
-        estadoPartidaSocket(roomId); 
+        estadoPartidaSocket(roomId);
 
         iniciarCronometro(roomId);
     }
