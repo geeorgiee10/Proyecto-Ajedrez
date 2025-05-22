@@ -19,7 +19,11 @@ export function ModoOnline() {
     const [cronometro, setCronometro] = useState({ w: 300, b: 300});
     const [jugadores, setJugadores] = useState([]);
 
+    const [mensajes, setMensajes] = useState([]);
+    const [mensajeInput, setMensajeInput] = useState('');
+    const mensajesRef = useRef(null);
 
+    const SERVER_URL = 'http://localhost:2908';
 
     useEffect(() => {
         const noAuntenticado = auth.onAuthStateChanged((user) => {
@@ -58,6 +62,15 @@ export function ModoOnline() {
             setCronometro(cronometro);
         });
 
+        socket.on('nuevoMensaje', (mensaje) => {
+            setMensajes(prev => [...prev, mensaje]);
+            setTimeout(() => {
+                if (mensajesRef.current) {
+                    mensajesRef.current.scrollTop = mensajesRef.current.scrollHeight;
+                }
+            }, 100);
+        })
+
         return () => {
             socket.disconnect();
         };
@@ -88,6 +101,14 @@ export function ModoOnline() {
         navigate('/jugar');
     };
 
+    const enviarMensaje = () => {
+        if(mensajeInput.trim() === ''){
+            return;
+        }
+        socket.emit('enviarMensaje', mensajeInput);
+        setMensajeInput('');
+    }
+
     const jugadorBlancas = jugadores.find(j => j.color === 'w');
     const jugadorNegras = jugadores.find(j => j.color === 'b');
 
@@ -104,94 +125,142 @@ export function ModoOnline() {
                 </>
             ) : (
                 <>
-                     <div className="text-center mb-4">
-                        <h2 className="textoPrimario">{estado}</h2>
-                        <h3 className="textoSecundario">Turno de las piezas {turno === 'w' ? 'blancas' : 'negras'}</h3>
-                        <h4 className="textoTerciario">Controlas a las piezas {jugadorColor === 'w' ? 'blancas' : 'negras'}</h4>
-                    </div>
+                    <div className='row'>
 
-                    <div className="row justify-content-center">
-                        <div className="col-lg-6 mb-4">
-                            <div className="card shadow-sm">
-                                <div className="card-body text-center">
-                                    <div className="d-flex justify-content-around mb-3">
-                                        <div>
-                                            {jugadorBlancas && (
-                                                <>
-                                                    <img
-                                                        src={jugadorBlancas.avatar}
-                                                        alt={`Avatar de ${jugadorBlancas.nombre_email || 'Jugador'}`}
-                                                        className="rounded-circle"
-                                                    />
-                                                    <h5>{jugadorBlancas.nombre_email || 'Jugador'}</h5>
-                                                </>
-                                            )}
-                                            <span className="badge bg-light text-dark fs-5">
-                                                {formCronometro(cronometro.w)}
-                                            </span>
+                        <div className='col-md-4 mb-4'>
+                            <div className='card h-100 shadow-sm'>
+                                <div className='card-header text-center fondoPrimario text-white'>
+                                    Chat de la partida
+                                </div>
+                                <div className="card-body overflow-auto" ref={mensajesRef}>
+                                {mensajes.map((mensaje, indice) => (
+                                    <div key={indice} className="mb-3 border-bottom pb-2">
+                                        
+                                        <div className='d-flex align-items-center gap-2'>
+                                            <img
+                                                src={`${SERVER_URL}${mensaje.avatar}`}
+                                                alt={`Avatar de ${mensaje.nombre_email || 'Jugador'}`}
+                                                className="rounded-circle img-thumbnail imagenModoOnline"
+                                            />
                                         </div>
                                         <div>
-                                            {jugadorNegras && (
-                                                <>
-                                                    <img
-                                                        src={jugadorNegras.avatar}
-                                                        alt={`Avatar de ${jugadorNegras.nombre_email}`}
-                                                        className="rounded-circle"
-                                                    />
-                                                    <h5>{jugadorNegras.nombre_email}</h5>
-                                                </>
-                                            )}
-                                            <span className="badge bg-dark fs-5">
-                                                {formCronometro(cronometro.b)}
-                                            </span>
+                                            <strong className="d-block">{mensaje.jugador}</strong>
                                         </div>
+                                        <div className='mt-2 ms-5'>{mensaje.texto}</div>
                                     </div>
-
-                                    <Chessboard
-                                        position={fen}
-                                        boardOrientation={jugadorColor === 'w' ? 'white' : 'black'}
-                                        customDarkSquareStyle={{ backgroundColor: '#6789D3' }}
-                                        customLightSquareStyle={{ backgroundColor: '#F0EAD6' }}
-                                        onPieceDrop={(from, to) => {
-                                            if (turno !== jugadorColor || estado !== '') {
-                                                return false;
-                                            }
-                                            return moverPieza(from, to);
-                                        }}
+                                ))}
+                                </div>
+                                <div className="card-footer d-flex">
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        placeholder="Escribe un mensaje..."
+                                        value={mensajeInput}
+                                        onChange={e => setMensajeInput(e.target.value)}
+                                        onKeyDown={e => e.key === 'Enter' && enviarMensaje()}
                                     />
+                                    <button className="btn btn-outline-secondary btn-lg ms-2" onClick={enviarMensaje}>Enviar</button>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div className="mx-auto">
-                        <div className="card mb-3">
-                            <h4 className="card-header text-center fw-bold">Piezas blancas capturadas:</h4>
-                            <div className="card-body d-flex flex-wrap justify-content-center">
-                                {piezasCapturadas('w')}
+
+                        <div className='col-md-8'>
+
+                            <div className="text-center mb-4">
+                                <h2 className="textoPrimario">{estado}</h2>
+                                <h3 className="textoSecundario">Turno de las piezas {turno === 'w' ? 'blancas' : 'negras'}</h3>
+                                <h4 className="textoTerciario">Controlas a las piezas {jugadorColor === 'w' ? 'blancas' : 'negras'}</h4>
                             </div>
-                        </div>
 
-                        <div className="card">
-                            <h4 className="card-header text-center fw-bold">Piezas negras capturadas:</h4>
-                            <div className="card-body d-flex flex-wrap justify-content-center">
-                                {piezasCapturadas('b')}
+                            <div className="row justify-content-center">
+                                <div className="col-lg-8 mb-4">
+                                    <div className="card shadow-sm">
+                                        <div className="card-body text-center">
+                                            <div className="d-flex justify-content-around mb-3">
+                                                <div>
+                                                    {jugadorBlancas && (
+                                                        <>
+                                                            <img
+                                                                src={`${SERVER_URL}${jugadorBlancas.avatar}`}
+                                                                alt={`Avatar de ${jugadorBlancas.nombre_email || 'Jugador'}`}
+                                                                className="rounded-circle img-thumbnail imagenModoOnline"
+                                                            />
+                                                            <h5>{jugadorBlancas.nombre_email || 'Jugador'}</h5>
+                                                        </>
+                                                    )}
+                                                    <span className="badge bg-light text-dark fs-5">
+                                                        {formCronometro(cronometro.w)}
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    {jugadorNegras && (
+                                                        <>
+                                                            <img
+                                                                src={`${SERVER_URL}${jugadorNegras.avatar}`}
+                                                                alt={`Avatar de ${jugadorNegras.nombre_email}`}
+                                                                className="rounded-circle img-thumbnail imagenModoOnline"
+                                                            />
+                                                            <h5>{jugadorNegras.nombre_email}</h5>
+                                                        </>
+                                                    )}
+                                                    <span className="badge bg-dark fs-5">
+                                                        {formCronometro(cronometro.b)}
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <Chessboard
+                                                position={fen}
+                                                boardOrientation={jugadorColor === 'w' ? 'white' : 'black'}
+                                                customDarkSquareStyle={{ backgroundColor: '#6789D3' }}
+                                                customLightSquareStyle={{ backgroundColor: '#F0EAD6' }}
+                                                onPieceDrop={(from, to) => {
+                                                    if (turno !== jugadorColor || estado !== '') {
+                                                     return false;
+                                                    }
+                                                    return moverPieza(from, to);
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                    <div className='d-flex flex-column align-items-center gap-3 text-center mt-4'>
-                        <button onClick={abandonarPartida} className='btn btn-outline-secondary btn-lg'>
-                            Abandonar Partida
-                        </button>
 
-                        {estado && estado !== '' && (
-                            <button className="btn btn-outline-secondary btn-lg" onClick={() => navigate('/jugar')}>
-                                Volver a jugar
-                            </button>
-                        )}
-                    </div>
+                            <div className="mx-auto">
+                                <div className="card mb-3">
+                                    <h4 className="card-header text-center fw-bold">Piezas blancas capturadas:</h4>
+                                    <div className="card-body d-flex flex-wrap justify-content-center">
+                                        {piezasCapturadas('w')}
+                                    </div>
+                                </div>
 
+                                <div className="card">
+                                    <h4 className="card-header text-center fw-bold">Piezas negras capturadas:</h4>
+                                    <div className="card-body d-flex flex-wrap justify-content-center">
+                                        {piezasCapturadas('b')}
+                                    </div>
+                                </div>
+                            </div>
                     
+                            <div className='d-flex flex-column align-items-center gap-3 text-center mt-4'>
+                                <button onClick={abandonarPartida} className='btn btn-outline-secondary btn-lg'>
+                                    Abandonar Partida
+                                </button>
+
+                                {estado && estado !== '' && (
+                                    <button className="btn btn-outline-secondary btn-lg" onClick={() => navigate('/jugar')}>
+                                        Volver a jugar
+                                    </button>
+                                )}
+                            </div>
+
+
+                        </div>
+
+                    </div>
+
+
                 </>
             )}
         </div>

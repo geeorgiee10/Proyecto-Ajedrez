@@ -54,3 +54,13 @@
     justify-content: flex-end;
     height: 40vh;
 }
+
+.fondoPrimario{
+    background-color: var(--color-tablero-oscuro) !important;
+}
+
+.imagenModoOnline{
+    width: 20%;
+    height: 20%;
+    object-fit: cover;
+}
