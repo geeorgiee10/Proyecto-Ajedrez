@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 
 firebase.js
+
+firebaseAdmin.js
+nextmove-e3b79-firebase-adminsdk-fbsvc-e7781643d1.json
