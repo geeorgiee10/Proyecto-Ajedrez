@@ -74,20 +74,31 @@ module.exports = function(io, dbAdmin) {
     const chess = partida.chess;
     const movimiento = chess.move({ from, to, promotion: 'q' });
 
+
+
     if (movimiento) {
+
         if(movimiento.captured){
             partida.captured.push({ piece: movimiento.captured, color: movimiento.color === 'w' ? 'b' : 'w'});
         }
-      estadoPartidaSocket(roomId);
+
+        estadoPartidaSocket(roomId);
     }
   });
 
-  socket.on('abandonarPartida', ({userId}) => {
+  socket.on('abandonarPartida', async ({userId}) => {
+
+    
         if (!roomId || !partidas[roomId]) {
             return;
         }
 
         const partida = partidas[roomId];
+
+        if (partida.actualizado) {
+          return;
+        }
+
         const oponente =partida.players.find(p => p.id !== userId);
 
 
@@ -101,10 +112,35 @@ module.exports = function(io, dbAdmin) {
                 capturadas: partida.captured,
                 cronometro: partida.clocks
             });
+
+            const jugadores = {
+              blanco: partida.players.find(p => p.color === 'w')?.id,
+              negro: partida.players.find(p => p.color === 'b')?.id
+            }
+
+            const ganadorUserId = oponente.id;
+            const movimientos = partida.chess.history();
+
+            const duracion = 600 - (partida.clocks.w + partida.clocks.b);
+            partida.actualizado = true;
+
+            console.log('Antes de guardar: movimientos:', partida.chess.history());
+console.log('Movimientos', movimientos);
+console.log('roomId:', roomId);
+
+            await guardarPartida({ jugadores, duracion, ganador: ganadorUserId, movimientos });
+
+            await actualizarUsuarios(ganadorUserId, jugadores);
+
+            
+            
         }
+
+        
 
         clearInterval(partida.interval);
         delete partidas[roomId];
+        socket.disconnect(true);
 
   });
 
@@ -125,13 +161,22 @@ module.exports = function(io, dbAdmin) {
     io.to(roomId).emit('nuevoMensaje', mensajeUsuario);
   })
 
-  socket.on('disconnect', () => {
+  socket.on('disconnect', async () => {
     if (!roomId || !partidas[roomId]) {
       return;
     }
 
     const partida = partidas[roomId];
-    const oponente =partida.players.find(p => p.id !== userId);
+
+    if(partida.actualizado){
+      clearInterval(partida.interval);
+      delete partidas[roomId];
+      return;
+    }
+
+    socket.userId = userId;
+
+    const oponente =partida.players.find(p => p.id !== socket.userId);
 
     if(oponente){
         const turno = partida.chess.turn();
@@ -143,6 +188,21 @@ module.exports = function(io, dbAdmin) {
             capturadas: partida.captured,
             cronometro: partida.clocks
         });
+
+        const jugadores = {
+            blanco: partida.players.find(p => p.color === 'w')?.id,
+            negro: partida.players.find(p => p.color === 'b')?.id
+        }
+
+        const ganadorUserId = oponente.id;
+        const movimientos = partida.chess.history();
+        const duracion = 600 - (partida.clocks.w + partida.clocks.b);
+
+        await guardarPartida({ jugadores, duracion, ganador: ganadorUserId, movimientos });
+
+        await actualizarUsuarios(ganadorUserId, jugadores);
+
+        partida.actualizado = true;
     }
 
     clearInterval(partida.interval);
@@ -150,7 +210,7 @@ module.exports = function(io, dbAdmin) {
 
   });
 
-  function estadoPartidaSocket(roomId) {
+  async function estadoPartidaSocket(roomId) {
     const partida = partidas[roomId];
     const estado = obtenerEstado(partida.chess);
 
@@ -161,6 +221,33 @@ module.exports = function(io, dbAdmin) {
       capturadas: partida.captured,
       cronometro: partida.clocks
     });
+
+    if(partida.chess.isGameOver()){
+      clearInterval(partida.interval);
+
+      if (!partida.actualizado) {
+
+        const ganadorColor = partida.chess.turn() === 'w' ? 'b' : 'w';
+        const ganadorUserId = partida.players.find(p => p.color === ganadorColor)?.id || null;
+
+        const jugadores = {
+            blanco: partida.players.find(p => p.color === 'w')?.id,
+            negro: partida.players.find(p => p.color === 'b')?.id
+        }
+
+        const movimientos = partida.chess.history();
+              console.log('Movimientos para guardar en estadoPartidaSocket:', movimientos);
+
+
+        const duracion = 600 - (partida.clocks.w + partida.clocks.b);
+
+        await guardarPartida({jugadores, duracion, ganador: ganadorUserId, movimientos});
+
+        await actualizarUsuarios(ganadorUserId, jugadores);
+
+        partida.actualizado = true;
+      }
+    }
   }
 
   function obtenerEstado(chess) {
@@ -180,7 +267,7 @@ module.exports = function(io, dbAdmin) {
   }
 
   function iniciarCronometro(roomId){
-    partidas[roomId].interval = setInterval(() => {
+    partidas[roomId].interval = setInterval(async () => {
         const partida = partidas[roomId];
         const turno = partida.chess.turn();
 
@@ -189,6 +276,9 @@ module.exports = function(io, dbAdmin) {
         if(partida.clocks[turno] <=0){
             clearInterval(partida.interval);
             const ganador = turno === 'w' ? 'negras' : 'blancas';
+            const ganadorColor = turno === 'w' ? 'b' : 'w';
+            const ganadorUserId = partida.players.find(p => p.color === ganadorColor)?.id || null;
+
             io.to(roomId).emit('estadoPartida', {
                 fen: partida.chess.fen(),
                 turno,
@@ -196,11 +286,81 @@ module.exports = function(io, dbAdmin) {
                 capturadas: partida.captured,
                 cronometro: partida.clocks
             });
+
+            const jugadores = {
+              blanco: partida.players.find(p => p.color === 'w')?.id,
+              negro: partida.players.find(p => p.color === 'b')?.id
+            }
+
+            const movimientos = partida.chess.history();
+            const duracion = 600 - (partida.clocks.w + partida.clocks.b);
+
+            await guardarPartida({ jugadores, duracion, ganador: ganadorUserId, movimientos });
+
+            await actualizarUsuarios(ganadorUserId, jugadores);
         }
         else{
             estadoPartidaSocket(roomId);
         }
     }, 1000);
   }
+
+  
+  async function actualizarUsuarios(ganador, jugadores) {
+    for( const color in jugadores){
+      const userID = jugadores[color];
+
+      const consulta = await dbAdmin.collection('usurios').where('usuarioID', '==', userID).get();
+
+      if(consulta.empty){
+        continue;
+      }
+
+      const docRef = consulta.docs[0].ref;
+      const data = consulta.docs[0].data();
+
+      const stats = data.estadísticas || {};
+
+      let partidas_ganadas = stats.partidas_ganadas || 0;
+      let partidas_perdidas = stats.partidas_perdidas || 0;
+      let partidas_empatadas = stats.partidas_empatadas || 0;
+
+      if(ganador === userID){
+        partidas_ganadas++;
+      }
+      else if(ganador === null){
+        partidas_empatadas++;
+      }
+      else{
+        partidas_perdidas++;
+      }
+
+      await docRef.update({
+        estadísticas: {
+          partidas_ganadas,
+          partidas_perdidas,
+          partidas_empatadas
+        }
+      });
+    }
+  }
+
+  async function guardarPartida({jugadores, duracion, ganador, movimientos}) {
+    try {
+      console.log('Movimientos en guardar', movimientos)
+      await dbAdmin.collection('partidas').doc(roomId).set({
+        jugadores,
+        duracion,
+        ganador,
+        movimientos,
+        fecha: new Date()
+      });
+    } catch (error) {
+      console.error('Error al guardar partida:', error);
+    }
+  }
+
+  
+
 });
 }

@@ -45,7 +45,6 @@ export function ModoOnline() {
 
         socket.on('jugadoresActualizados', (players) => {
             setJugadores(players);
-            console.log(jugadores);
         });
 
         socket.on('colorAsignado', (color) => setJugadorColor(color));
@@ -216,7 +215,7 @@ export function ModoOnline() {
                                                 customDarkSquareStyle={{ backgroundColor: '#6789D3' }}
                                                 customLightSquareStyle={{ backgroundColor: '#F0EAD6' }}
                                                 onPieceDrop={(from, to) => {
-                                                    if (turno !== jugadorColor || estado !== '') {
+                                                    if (turno !== jugadorColor || estado === 'Jaque mate' || estado === 'Tablas') {
                                                      return false;
                                                     }
                                                     return moverPieza(from, to);

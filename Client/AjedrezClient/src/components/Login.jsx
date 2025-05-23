@@ -78,9 +78,8 @@ export function Login() {
               if (consultaUsuarios.empty) { // Si no existe el usuario en la colección
                 await addDoc(collection(db, 'usurios'), {
                   amigoID: [],
-                  avatar: 'rutaImagenDefectoServidor', 
+                  avatar: '/images/avatar_default.png', 
                   estadísticas: {
-                    calidad_promedio_movimientos: 0,
                     partidas_ganadas: 0, 
                     partidas_perdidas: 0, 
                     partidas_empatadas: 0, 
