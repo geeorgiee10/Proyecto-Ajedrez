@@ -79,7 +79,7 @@ export function Header() {
                   </Link>
               )}
 
-              <Link className="LinkRouter" to="/">
+              <Link className="LinkRouter" to="/ranking">
                 <li className="nav-item">
                   <span className="nav-link">Ranking</span>
                 </li>

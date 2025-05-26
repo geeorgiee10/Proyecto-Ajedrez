@@ -9,6 +9,7 @@ import { Jugar } from './components/Jugar.jsx';
 import { ModoLocal }from './components/ModoLocal.jsx';
 import { ModoIA } from './components/ModoIA.jsx';
 import { ModoOnline } from './components/ModoOnline.jsx';
+import { Ranking } from './components/Ranking.jsx';
 import { Error404 } from './components/Error404.jsx';
 import { RutasProtegidas } from './components/RutasProtegidas.jsx';
 import { RutasLogin } from './components/RutasLogin.jsx';
@@ -38,6 +39,7 @@ function App() {
             <Route path="/modo-online" element={<ModoOnline />} />
           </Route>
           <Route path="/modo-local" element={<ModoLocal />} />
+          <Route path="/ranking" element={<Ranking />} />
           <Route path="*" element={<Error404 />} />
         </Routes>
       </main>
