@@ -77,7 +77,6 @@ export function Login() {
               const consultaUsuarios = await getDocs(consulta);
               if (consultaUsuarios.empty) { // Si no existe el usuario en la colección
                 await addDoc(collection(db, 'usurios'), {
-                  amigoID: [],
                   avatar: '/images/avatar_default.png', 
                   estadísticas: {
                     partidas_ganadas: 0, 

@@ -72,7 +72,7 @@ export function Header() {
               )}
 
               {estaIniciado && (
-                  <Link className="LinkRouter" to="/">
+                  <Link className="LinkRouter" to="/perfil">
                     <li className="nav-item">
                       <span className="nav-link">Mi cuenta</span>
                     </li>

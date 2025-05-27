@@ -342,6 +342,39 @@ console.log('roomId:', roomId);
           partidas_empatadas
         }
       });
+
+      if (ganador === userID) {
+        await completarLogros(userID, partidas_ganadas);
+      }
+    }
+  }
+
+  async function completarLogros(usuarioID, partidasGanadas){
+    const LOGRO_10_VICTORIAS_ID = 'ganar10Partidas';
+    const LOGRO_50_VICTORIAS_ID = 'ganar50Partidas';
+
+    const logrosCompletados = await dbAdmin.collection('logrosCompletados')
+    .where('usuarioID', '==', usuarioID)
+    .get();
+
+    const logrosCompletadosID = logrosCompletados.docs.map(doc => doc.data().logroID);
+
+    async function agregarLogro(logroID) {
+      if (!logrosCompletadosID.includes(logroID)) {
+        await dbAdmin.collection('logrosCompletados').add({
+          usuarioID,
+          logroID,
+          fecha: new Date()
+        });
+      //console.log(`Logro ${logroID} completado para usuario ${usuarioID}`);
+      }
+    }
+
+    if(partidasGanadas >= 50){
+      await agregarLogro(LOGRO_50_VICTORIAS_ID);
+    }
+    else if (partidasGanadas >= 10) {
+      await agregarLogro(LOGRO_10_VICTORIAS_ID);
     }
   }
 
