@@ -1,5 +1,71 @@
 .imagenPerfil{
-    width: 20%;
-    height: 20%;
+    min-width: 20%;
+    max-width: 20%;
+    min-height: 20%;
+    max-height: 20%;
     object-fit: cover;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4); 
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.imagenPerfil:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+}
+
+.imagenModal{
+    min-width: 15%;
+    max-width: 15%;
+    min-height: 15%;
+    max-height: 15%;
+    object-fit: cover;
+}
+
+.nombreConEstrella::after{
+    content: '⭐';
+    margin-left: 0.5rem;
+    color: gold;
+    font-size: 1.2em;
+}
+
+.nombreEnColores{
+    font-weight: bold;
+    background: linear-gradient(
+        270deg,
+        #ff4d4d,
+        #ffa64d,
+        #ffff4d,
+        #80ff80,
+        #4dd2ff,
+        #b84dff,
+        #ff4da6
+    );
+    background-size: 1500% 1500%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: cambiarColorTexto 8s ease-in-out infinite;
+}
+
+.nombreConSombra{
+    text-shadow: 2px 2px 2px rgba(0,0,0,0.3);
+    font-weight: bold;
+}
+
+.fotoConCirculo{
+   border-radius: 50%;
+    padding: 8px;
+    background: radial-gradient(circle at center, #fdf6e3, #d4af37); 
+    border: 5px solid #8b5e3c;
+    box-shadow:
+        inset -4px -4px 8px rgba(255, 255, 255, 0.4), 
+        inset 4px 4px 8px rgba(0, 0, 0, 0.2),         
+        0 6px 12px rgba(0, 0, 0, 0.4);                
+
+
+}
+
+@keyframes cambiarColorTexto {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }

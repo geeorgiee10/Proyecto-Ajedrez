@@ -23,7 +23,20 @@ export function ModoOnline() {
     const [mensajeInput, setMensajeInput] = useState('');
     const mensajesRef = useRef(null);
 
+    const jugadoresRef = useRef(jugadores);
+
+     useEffect(() => {
+        jugadoresRef.current = jugadores;
+    }, [jugadores]);
+
+
     const SERVER_URL = 'http://localhost:2908';
+
+    const recompensasLogros = {
+        ganar10Partidas: 'nombreConEstrella',
+        Mandar100Mensajes: 'nombreEnColores',
+        Crear10Foros: 'nombreConSombra'
+    }
 
     useEffect(() => {
         const noAuntenticado = auth.onAuthStateChanged((user) => {
@@ -44,7 +57,21 @@ export function ModoOnline() {
         socket.emit('unirsePartida', { userId });
 
         socket.on('jugadoresActualizados', (players) => {
-            setJugadores(players);
+            const jugadoresConEstilosVisuales = players.map(jugador => {
+            const clasesVisuales = jugador.estilos
+                ?.map(logro => recompensasLogros[logro])
+                .filter(Boolean);
+
+                const estiloCirculoImagen = jugador.estilos?.includes('Mandar500Mensajes');
+                const claseAvatar = estiloCirculoImagen ? 'fotoConCirculo' : '';
+                return {
+                    ...jugador,
+                    estilosOriginales: jugador.estilos,
+                    estilos: clasesVisuales,
+                    claseAvatar,
+                };
+            });
+            setJugadores(jugadoresConEstilosVisuales);
         });
 
         socket.on('colorAsignado', (color) => setJugadorColor(color));
@@ -62,7 +89,24 @@ export function ModoOnline() {
         });
 
         socket.on('nuevoMensaje', (mensaje) => {
-            setMensajes(prev => [...prev, mensaje]);
+            const jugadorRelacionado = jugadoresRef.current.find(j => j.id === mensaje.id || j.nombre_email === mensaje.jugador);
+
+            const clasesVisuales = jugadorRelacionado?.estilos || [];
+            const estilosOriginales = jugadorRelacionado?.estilosOriginales || [];
+
+
+            const claseAvatar = estilosOriginales.includes('Mandar500Mensajes') ? 'fotoConCirculo' : '';
+
+            const mensajeConEstilos = {
+                ...mensaje,
+                clasesVisuales,
+                claseAvatar
+            };
+           
+            setMensajes(prev => [...prev, mensajeConEstilos]);
+
+            
+
             setTimeout(() => {
                 if (mensajesRef.current) {
                     mensajesRef.current.scrollTop = mensajesRef.current.scrollHeight;
@@ -139,11 +183,11 @@ export function ModoOnline() {
                                             <img
                                                 src={`${SERVER_URL}${mensaje.avatar}`}
                                                 alt={`Avatar de ${mensaje.nombre_email || 'Jugador'}`}
-                                                className="rounded-circle img-thumbnail imagenModoOnline"
+                                                className={`rounded-circle img-thumbnail imagenModoOnline ${mensaje.claseAvatar}`}
                                             />
                                         </div>
                                         <div>
-                                            <strong className="d-block">{mensaje.jugador}</strong>
+                                            <strong className={`d-block ${mensaje.clasesVisuales.join(' ')}`}>{mensaje.jugador}</strong>
                                         </div>
                                         <div className='mt-2 ms-5'>{mensaje.texto}</div>
                                     </div>
@@ -183,9 +227,9 @@ export function ModoOnline() {
                                                             <img
                                                                 src={`${SERVER_URL}${jugadorBlancas.avatar}`}
                                                                 alt={`Avatar de ${jugadorBlancas.nombre_email || 'Jugador'}`}
-                                                                className="rounded-circle img-thumbnail imagenModoOnline"
+                                                                className={`rounded-circle img-thumbnail imagenModoOnline ${jugadorBlancas.claseAvatar}`}
                                                             />
-                                                            <h5>{jugadorBlancas.nombre_email || 'Jugador'}</h5>
+                                                            <h5 className={jugadorBlancas.estilos?.join(' ')}>{jugadorBlancas.nombre_email || 'Jugador'}</h5>
                                                         </>
                                                     )}
                                                     <span className="badge bg-light text-dark fs-5">
@@ -198,9 +242,9 @@ export function ModoOnline() {
                                                             <img
                                                                 src={`${SERVER_URL}${jugadorNegras.avatar}`}
                                                                 alt={`Avatar de ${jugadorNegras.nombre_email}`}
-                                                                className="rounded-circle img-thumbnail imagenModoOnline"
+                                                                className={`rounded-circle img-thumbnail imagenModoOnline ${jugadorNegras.claseAvatar}`}
                                                             />
-                                                            <h5>{jugadorNegras.nombre_email}</h5>
+                                                            <h5 className={jugadorNegras.estilos?.join(' ')}>{jugadorNegras.nombre_email}</h5>
                                                         </>
                                                     )}
                                                     <span className="badge bg-dark fs-5">

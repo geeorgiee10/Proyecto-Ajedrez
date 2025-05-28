@@ -1,6 +1,6 @@
 import { auth } from '../../firebase';
 import { useEffect, useState, useRef } from 'react';
-import { collection, addDoc, where, getDocs, query } from "firebase/firestore";
+import { collection, doc, where, getDocs, query, updateDoc  } from "firebase/firestore";
 import { db } from "../../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 
@@ -13,8 +13,25 @@ export function Perfil() {
     const [usuarioLogueado, setUsuarioLogueado] = useState(null);
     const [logros, setLogros] = useState([]);
     const [logrosCompletados, setLogrosCompletados] = useState([]);
+    const [mostrarModal, setMostrarModal] = useState(false);
+    const [nuevoNombre, setNuevoNombre] = useState('');
+    const [nuevaRutaAvatar, setNuevaRutaAvatar] = useState('');
 
     const SERVER_URL = 'http://localhost:2908'; 
+
+    const recompensasLogros = {
+        ganar10Partidas: 'nombreConEstrella',
+        Mandar100Mensajes: 'nombreEnColores',
+        Crear10Foros: 'nombreConSombra'
+    }
+
+    const avatarOptions = [
+        `/images/imagenPerfil2.jpg`,
+        `/images/imagenPerfil3.jpg`,
+        `/images/imagenPerfil4.jpg`,
+        `/images/imagenPerfil5.jpg`,
+        `/images/imagenPerfil6.jpg`,
+    ];
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -29,6 +46,13 @@ export function Perfil() {
 
         return () => unsubscribe();
     }, []);
+
+    useEffect(() => {
+        if(datosUsuario){
+            setNuevoNombre(datosUsuario.nombre_email);
+            setNuevaRutaAvatar(datosUsuario.avatar);
+        }
+    }, [datosUsuario]);
 
 
 
@@ -99,6 +123,33 @@ export function Perfil() {
         fectchLogrosCompletados();
     }, [usuarioLogueado]);
 
+    const guardarCambios = async () => {
+        if(!usuarioLogueado){
+            return;
+        }
+
+        try{
+            const consulta = query(collection(db, "usurios"), where("usuarioID", "==", usuarioLogueado.uid));
+            const datos = await getDocs(consulta);
+            if(!datos.empty){
+                const userDocRef = doc(db, "usurios", datos.docs[0].id);
+                await updateDoc(userDocRef, {
+                    nombre_email: nuevoNombre,
+                    avatar: nuevaRutaAvatar
+                });
+                setDatosUsuario(prev => ({
+                    ...prev,
+                    nombre_email: nuevoNombre,
+                    avatar: nuevaRutaAvatar
+                }));
+                setMostrarModal(false);
+            }
+        }
+        catch (error) {
+            console.error("Error actualizando perfil:", error);
+        }
+    }
+
 
     if (cargar){
         return <div className="text-center mt-5">Loading profile...</div>;
@@ -114,17 +165,22 @@ export function Perfil() {
     : 0;
     const partidasJugadas = partidas_ganadas + partidas_perdidas + partidas_empatadas;
 
+    const clasesNombre = logrosCompletados.map(id => recompensasLogros[id]).filter(Boolean).join(' ');
+
+    const claseAvatar = logrosCompletados.includes('Mandar500Mensajes') ? 'fotoConCirculo' : '';
+
+
     return (
-      <div className="container mt-5">
+      <div className="container mt-5 mb-3">
       <div className="card text-center p-3">
         <img
           src={`${SERVER_URL}${avatar}`}
           alt="avatar"
-          className="rounded-circle mx-auto mb-3 imagenPerfil"
+          className={`rounded-circle mx-auto mb-3 imagenPerfil ${claseAvatar}`}
         />
-        <h4>{nombre_email}</h4>
+        <h4 className={clasesNombre}>{datosUsuario.nombre_email}</h4>
         <p className="text-muted">{usuarioLogueado.email}</p>
-        <button className="btn btn-outline-primary mb-4">Editar Perfil</button>
+        <button className="btn btn-outline-primary mb-4" onClick={() => setMostrarModal(true)}>Editar Perfil</button>
 
         <div className="card mb-3">
           <div className="card-body">
@@ -168,6 +224,9 @@ export function Perfil() {
                             <div className='text-start'>
                                 <h6 className='mb-1'>{logro.nombre}</h6>
                                 <small>{logro.descripcion}</small>
+                                <div className="text-success small ms-4 mt-1">
+                                    🎁 Recompensa: <em>{logro.recompensas}</em>
+                                </div>
                                 {completado && <span className="badge bg-success ms-2">Completado</span>}
                             </div>
                              {completado && (
@@ -181,7 +240,76 @@ export function Perfil() {
           </div>
         </div>
       </div>
+
+      {mostrarModal && (
+        <div className="modal show fade d-block" tabIndex="-1" role="dialog">
+          <div className="modal-dialog modal-lg" role="document">
+            <div className="modal-content">
+
+              <div className="modal-header">
+                <h5 className="modal-title">Editar Perfil</h5>
+                <button type="button" className="btn-close" onClick={() => setMostrarModal(false)}></button>
+              </div>
+
+              <div className="modal-body">
+                <div className="mb-3">
+                  <label htmlFor="nombreInput" className="form-label">Nombre</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="nombreInput"
+                    value={nuevoNombre}
+                    onChange={(e) => setNuevoNombre(e.target.value)}
+                  />
+                </div>
+
+                <div>
+                  <label className="form-label">Selecciona un avatar</label>
+                  <div className="d-flex gap-2 flex-wrap justify-content-center">
+                    {avatarOptions
+                        .filter((ruta) => {
+                            if (ruta.includes("imagenPerfil2.jpg") && !logrosCompletados.includes("ganar50Partidas")) {
+                                return false;
+                            }
+                            return true;
+                        })
+                        .map((ruta) => (
+                            <img
+                                key={ruta}
+                                src={`${SERVER_URL}${ruta}`}
+                                alt="avatar option"
+                                className={`rounded-circle imagenModal avatar-option ${nuevaRutaAvatar === ruta ? 'border border-primary border-3' : ''}`}
+                                onClick={() => setNuevaRutaAvatar(ruta)}
+                            />
+                        ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-primary mx-3"
+                  onClick={() => setMostrarModal(false)}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={guardarCambios}
+                >
+                  Actualizar
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      )}
     </div>
+
+    
     );
   }
   

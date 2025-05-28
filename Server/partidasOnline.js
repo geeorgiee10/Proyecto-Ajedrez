@@ -26,6 +26,11 @@ module.exports = function(io, dbAdmin) {
         const userData = userDoc.data();
         nombre_email = userData.nombre_email || 'Jugador';
         avatar = userData.avatar || 'https://via.placeholder.com/100';
+
+        const logrosSnap = await dbAdmin.collection('logrosCompletados').where('usuarioID', '==', userId).get();
+
+        estilos = logrosSnap.docs.map(doc => doc.data().logroID);
+
       }
     } catch (error) {
       console.error('Error al obtener datos de usuario:', error);
@@ -49,7 +54,7 @@ module.exports = function(io, dbAdmin) {
     const partida = partidas[roomId]; 
 
     color = partida.players.length === 0 ? 'w' : 'b';
-    partida.players.push({ id: userId || socket.id, color, nombre_email, avatar });
+    partida.players.push({ id: userId || socket.id, color, nombre_email, avatar, estilos });
 
     socket.join(roomId);
     socket.emit('colorAsignado', color);
@@ -392,6 +397,7 @@ console.log('roomId:', roomId);
       console.error('Error al guardar partida:', error);
     }
   }
+
 
   
 
