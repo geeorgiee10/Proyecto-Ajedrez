@@ -36,7 +36,7 @@ export function LandingPage() {
           { title: "Modo IA", description: "Juega contra la máquina, elige tu nivel", icon: "robot" },
           { title: "Modo local", description: "Dos jugadores en un solo dispositivo", icon: "people" },
           { title: "Modo online", description: "Desafía a jugadores de todo el mundo", icon: "globe" },
-          { title: "Chat en partidas", description: "Comunicación en tiempo real", icon: "chat-left-text" },
+          { title: "Chat en partidas", description: "Habla en partida con otros jugadores", icon: "chat-left-text" },
         ].map((mode, i) => (
           <div className="col-md-3 mb-3" key={i}>
             <div className="p-3 rounded modos">
@@ -60,7 +60,8 @@ export function LandingPage() {
           <p>
             Comparte estrategias, participa en foros y gana recompensas.
           </p>
-          <button className="btn btn-outline-secondary w-100">Ver foros</button>
+          <Link className="btn btn-outline-secondary w-100" to="/foros">Ver foros</Link>
+
         </div>
         <div className="col-md-5 ms-auto contenedorImgForos">
           <img src="public/foros.jpg" alt="foros" className="imgForos"/>

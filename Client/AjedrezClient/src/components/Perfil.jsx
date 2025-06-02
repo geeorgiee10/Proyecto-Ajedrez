@@ -16,6 +16,7 @@ export function Perfil() {
     const [mostrarModal, setMostrarModal] = useState(false);
     const [nuevoNombre, setNuevoNombre] = useState('');
     const [nuevaRutaAvatar, setNuevaRutaAvatar] = useState('');
+    
 
     const SERVER_URL = 'http://localhost:2908'; 
 

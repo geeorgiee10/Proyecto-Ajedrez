@@ -64,7 +64,7 @@ export function Header() {
               
 
               {estaIniciado && (
-                  <Link className="LinkRouter" to="/">
+                  <Link className="LinkRouter" to="/foros">
                     <li className="nav-item">
                       <span className="nav-link">Foros</span>
                     </li>

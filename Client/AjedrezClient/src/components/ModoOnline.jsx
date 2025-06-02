@@ -50,7 +50,6 @@ export function ModoOnline() {
 
     useEffect(() => {
         if (!userId) return;
-        // Cuando un usuario se conecta lo une a la sala
         socket = io("http://localhost:2908");
         socket.connect();
 

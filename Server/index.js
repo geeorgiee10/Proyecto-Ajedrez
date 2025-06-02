@@ -28,6 +28,8 @@ app.get('/', (req, res) => {
 
 require('./partidasOnline')(io, dbAdmin);
 
+require('./foros')(io, dbAdmin);
+
 server.listen(port, () => {
   console.log(`Servidor escuchando en http://localhost:${port}`);
 });

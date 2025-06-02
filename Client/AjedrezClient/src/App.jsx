@@ -11,6 +11,8 @@ import { ModoIA } from './components/ModoIA.jsx';
 import { ModoOnline } from './components/ModoOnline.jsx';
 import { Ranking } from './components/Ranking.jsx';
 import { Perfil } from './components/Perfil.jsx';
+import { Foros } from './components/Foros.jsx';
+import { ForosConversacion } from './components/ForosConversacion.jsx'
 import { Error404 } from './components/Error404.jsx';
 import { RutasProtegidas } from './components/RutasProtegidas.jsx';
 import { RutasLogin } from './components/RutasLogin.jsx';
@@ -41,6 +43,10 @@ function App() {
           </Route>
           <Route element={<RutasProtegidas />}>
             <Route path="/perfil" element={<Perfil />} />
+          </Route>
+          <Route element={<RutasProtegidas />}>
+            <Route path="/foros" element={<Foros />} />
+            <Route path="/foros/:id" element={<ForosConversacion />} />
           </Route>
           <Route path="/modo-local" element={<ModoLocal />} />
           <Route path="/ranking" element={<Ranking />} />
