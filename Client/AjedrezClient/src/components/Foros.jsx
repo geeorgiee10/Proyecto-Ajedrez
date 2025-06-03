@@ -70,6 +70,30 @@ export function Foros() {
           fecha: new Date()
         });
         handleClose()
+
+        const forosUsuarioConsulta = query(collection(db, 'foros'), where('autorID', '==', usuarioLogueado.uid));
+        const forosUsuarioDatos = await getDocs(forosUsuarioConsulta);
+        const totalForosUsuario = forosUsuarioDatos.size;
+
+        if(totalForosUsuario >= 10){
+            const LOGRO_10_FOROS_ID = 'Crear10Foros';
+
+            const logroConsulta = query(
+              collection(db, 'logrosCompletados'),
+              where('usuarioID', '==', usuarioLogueado.uid),
+              where('logroID', '==', LOGRO_10_FOROS_ID),
+            );
+
+            const logrosDatos= await getDocs(logroConsulta);
+
+            if(logrosDatos.empty){
+              await addDoc(collection(db, 'logrosCompletados'), {
+                usuarioID: usuarioLogueado.uid,
+                logroID: LOGRO_10_FOROS_ID,
+                fecha: new Date(),
+              });
+            }
+        }
       }
       catch(error){
         console.log("Error al crear el foro: ", error);

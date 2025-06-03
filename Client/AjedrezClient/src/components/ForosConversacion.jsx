@@ -16,10 +16,18 @@ export function ForosConversacion() {
     const [nuevoMensaje, setNuevoMensaje] = useState("");
     const [mensajeForoNoEncontrado, setMensajeForoNoEncontrado] = useState(false);
     const [datosUsuario, setDatosUsuario] = useState(null);
+    const [logrosTodosUsuarios, setLogrosTodosUsuarios] = useState({});
 
     const usuarioActual = auth.currentUser;
 
     const SERVER_URL = 'http://localhost:2908';
+
+    const recompensasLogros = {
+        ganar10Partidas: 'nombreConEstrella',
+        Mandar100Mensajes: 'nombreEnColores',
+        Mandar500Mensajes: 'fotoConCirculo',
+        Crear10Foros: 'nombreConSombra',
+    };
 
     useEffect(() => {
         if(!usuarioActual){
@@ -60,6 +68,10 @@ export function ForosConversacion() {
 
         socket.on('mensajeNuevo', (mensaje) => {
             setMensajes((msgs) => [...msgs, mensaje]);
+        });
+
+        socket.on('logrosTodosUsuarios', (logros) => {
+            setLogrosTodosUsuarios(logros);
         });
 
         return () => {
@@ -111,8 +123,13 @@ export function ForosConversacion() {
 
         socket.emit('enviarMensaje', mensajeEnviar);
         setNuevoMensaje('');
-    }
+    };
 
+
+    const obtenerClasesEstilos = (usuarioID) => {
+        const logros = logrosTodosUsuarios[usuarioID] || [];
+        return logros.map(logro => recompensasLogros[logro]).filter(Boolean);
+    };
 
   return (
     <div className="container py-4">
@@ -142,6 +159,9 @@ export function ForosConversacion() {
 
                     {mensajes.map((mensaje, idx) => {
                         const mensajePropio = mensaje.autorID === usuarioActual?.uid;
+                        const clasesUsuario = obtenerClasesEstilos(mensaje.autorID);
+                        const clasesNombre = clasesUsuario.filter(clase => clase.startsWith('nombre'));
+                        const clasesFoto = clasesUsuario.filter(clase => clase.startsWith('foto'));
 
                         return (
                             <div key={idx} className={`d-flex mb-3 ${mensajePropio ? "justify-content-end" : "justify-content-start"}`}>
@@ -150,18 +170,18 @@ export function ForosConversacion() {
                                     <img
                                         src={`${SERVER_URL}${mensaje.fotoURL}`}
                                         alt={mensaje.autor}
-                                        className="rounded-circle me-2 fotoMensajes"
+                                        className={`rounded-circle me-2 fotoMensajes ${clasesFoto.join(' ')}`}
                                     />    
                                 )}
                                 <div className={`p-2 rounded ${mensajePropio ? "bg-primary text-white" : "bg-light text-dark"}`}>
-                                    <small className="d-block fw-bold">{mensaje.autor}</small>
+                                    <small className={`d-block fw-bold ${clasesNombre.join(' ')}`}>{mensaje.autor}</small>
                                     <span>{mensaje.contenido}</span>
                                 </div>
                                 {mensajePropio && (
                                     <img
                                         src={`${SERVER_URL}${mensaje.fotoURL}`}
                                         alt={mensaje.autor}
-                                        className="rounded-circle ms-2 fotoMensajes"
+                                        className={`rounded-circle ms-2 fotoMensajes ${clasesFoto.join(' ')}`}
                                     />    
                                 )}
                             </div>
