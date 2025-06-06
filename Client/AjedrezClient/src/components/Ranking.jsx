@@ -4,7 +4,7 @@ import { collection, addDoc, where, getDocs, query } from "firebase/firestore";
 import { db } from "../../firebase";
 import { data } from 'react-router-dom';
 
-
+/**Componente para ver el ranking de los mejores jugadores del modo online */
 export function Ranking() {
     const [ranking, setRanking] = useState([]); 
     const [buscador, setBuscador] = useState("");

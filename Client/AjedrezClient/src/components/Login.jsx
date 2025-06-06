@@ -5,6 +5,7 @@ import { auth } from '../../firebase';
 import { collection, addDoc, where, getDocs, query } from "firebase/firestore";
 import { db } from "../../firebase";
 
+/**Componente para iniciar sesion y registrarse */
 export function Login() {
   const navigate = useNavigate();
 

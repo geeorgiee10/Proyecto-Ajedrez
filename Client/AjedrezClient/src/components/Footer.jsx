@@ -1,4 +1,4 @@
-
+/* Componente para el footer */ 
 export function Footer() {
 
   return (

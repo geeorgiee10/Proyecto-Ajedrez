@@ -4,6 +4,7 @@ import { Chess } from 'chess.js';
 import { Chessboard } from 'react-chessboard';
 import { useNavigate } from 'react-router-dom';
 
+/**Componente para jugar contra otro jugador en el mismo dispositivo*/
 export function ModoLocal() {
     const navigate = useNavigate();
 

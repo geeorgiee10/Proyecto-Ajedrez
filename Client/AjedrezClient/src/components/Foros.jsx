@@ -4,7 +4,7 @@ import { collection, addDoc, where, getDocs, query, onSnapshot } from "firebase/
 import { db } from "../../firebase";
 import { data,useNavigate } from 'react-router-dom';
 
-
+/**Componente para la páginas de los foros */
 export function Foros() {
     const [mostrarModal, setMostrarModal] = useState(false);
     const [buscador, setBuscador] = useState("");

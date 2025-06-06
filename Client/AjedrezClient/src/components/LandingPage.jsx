@@ -10,7 +10,7 @@ export function LandingPage() {
         <div className="col-md-6 text-center mb-4 mb-md-0">
           <div className="bg-light border rounded p-4">
             <div className="contenedorImgTablero">
-              <img src="public/tableroAjedrez.png" alt="tableroAjedrez" className="imgTablero"/>
+              <img src="tableroAjedrez.png" alt="tableroAjedrez" className="imgTablero"/>
             </div>
           </div>
         </div>
@@ -64,7 +64,7 @@ export function LandingPage() {
 
         </div>
         <div className="col-md-5 ms-auto contenedorImgForos">
-          <img src="public/foros.jpg" alt="foros" className="imgForos"/>
+          <img src="foros.jpg" alt="foros" className="imgForos"/>
         </div>
       </div>
     </div>

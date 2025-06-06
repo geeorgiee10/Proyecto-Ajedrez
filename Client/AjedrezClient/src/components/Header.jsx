@@ -1,8 +1,8 @@
 import { useState,useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Link } from "react-router";
-import { NavLink, useNavigate } from 'react-router-dom';
-import { auth } from '../../firebase';
+import { Link, useNavigate } from "react-router";
+import { auth, db } from '../../firebase';
 import { onAuthStateChanged, signOut  } from 'firebase/auth';
+import { collection, doc, where, getDocs, query, updateDoc  } from "firebase/firestore";
 
 export function Header() {
   const navigate = useNavigate();
@@ -11,10 +11,24 @@ export function Header() {
 
   useEffect(() => {
     // Escuchamos el cambio en el estado de autenticación
-    const comprobarInicioSesion = onAuthStateChanged(auth, (user) => {
+    const comprobarInicioSesion = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setEstaIniciado(true);
-        setNombreUsuario(user.displayName || user.email);
+        
+        try{
+          const consulta = query(collection(db, 'usurios'), where('usuarioID', '==', user.uid));
+
+          const datos = await getDocs(consulta);
+
+          if(!datos.empty){
+            const usuario = datos.docs[0].data();
+            setNombreUsuario(usuario.nombre_email);
+          }
+        }
+        catch(error){
+          console.log("Error fetching user data: ", error);
+        }
+
       } else {
         setEstaIniciado(false); 
         setNombreUsuario('');

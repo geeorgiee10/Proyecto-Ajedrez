@@ -19,16 +19,18 @@ const io = new Server(server, {
   addTrailingSlash: false
 });
 
-app.use(express.static(path.join(__dirname, '/public')));
-
-app.get('/', (req, res) => {
-   res.sendFile(path.join(__dirname, '../Client/AjedrezClient/index.html'));
-});
-
-
+/**Llamar a los otros archivos que contienen la lógica del servidor */
 require('./partidasOnline')(io, dbAdmin);
 
 require('./foros')(io, dbAdmin);
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+/**Para que el servidor tome las rutas del cliente y pueda funcionar correctamente las rutas */
+app.get(/^\/(?!api\/|socket\.io\/).*/, (req, res) => {
+   res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 
 server.listen(port, () => {
   console.log(`Servidor escuchando en http://localhost:${port}`);

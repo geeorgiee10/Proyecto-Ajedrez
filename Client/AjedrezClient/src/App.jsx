@@ -19,7 +19,7 @@ import { RutasLogin } from './components/RutasLogin.jsx';
 import { ScrollTop } from './components/ScrollTop.jsx';
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 
-
+/**Componente principal que define las rutas */
 function App() {
 
   return (

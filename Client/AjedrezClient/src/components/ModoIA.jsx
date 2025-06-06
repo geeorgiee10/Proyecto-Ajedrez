@@ -4,7 +4,7 @@ import { Chessboard } from 'react-chessboard';
 import createStockfish from '../utils/createStockfish';
 import { useNavigate } from 'react-router-dom';
 
-
+/**Componente para jugar contra la máquina */
 export function ModoIA() {
     const navigate = useNavigate();
 

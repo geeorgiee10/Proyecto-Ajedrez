@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 
 var socket;
 
+/**Componente para jugar contra otros jugadores online con chat en tiempo real */
 export function ModoOnline() {
     const navigate = useNavigate();
 
@@ -30,7 +31,7 @@ export function ModoOnline() {
     }, [jugadores]);
 
 
-    const SERVER_URL = 'http://localhost:2908';
+    const SERVER_URL = 'https://proyecto-ajedrez.onrender.com';
 
     const recompensasLogros = {
         ganar10Partidas: 'nombreConEstrella',
@@ -50,7 +51,7 @@ export function ModoOnline() {
 
     useEffect(() => {
         if (!userId) return;
-        socket = io("http://localhost:2908");
+        socket = io(/*"http://localhost:2908"*/);
         socket.connect();
 
         socket.emit('unirsePartida', { userId });

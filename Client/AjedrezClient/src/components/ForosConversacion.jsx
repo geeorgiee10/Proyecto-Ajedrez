@@ -7,6 +7,7 @@ import io from 'socket.io-client';
 
 var socket;
 
+/**Componente para las conversaciones de los foros */
 export function ForosConversacion() {
 
     const { id } = useParams();
@@ -20,7 +21,7 @@ export function ForosConversacion() {
 
     const usuarioActual = auth.currentUser;
 
-    const SERVER_URL = 'http://localhost:2908';
+    const SERVER_URL = 'https://proyecto-ajedrez.onrender.com';
 
     const recompensasLogros = {
         ganar10Partidas: 'nombreConEstrella',
@@ -56,7 +57,7 @@ export function ForosConversacion() {
 
         fetchUserData();
 
-        socket = io("http://localhost:2908");
+        socket = io(/*"http://localhost:2908"*/);
 
       
 

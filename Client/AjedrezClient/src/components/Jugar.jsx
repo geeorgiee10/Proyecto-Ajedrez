@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Link } from "react-router";
 
+/**Componente que redirije a los distintos modos de juego */
 export function Jugar() {
 
     return (

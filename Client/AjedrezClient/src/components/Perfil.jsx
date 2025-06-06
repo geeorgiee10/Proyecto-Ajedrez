@@ -5,7 +5,7 @@ import { db } from "../../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 
 
-
+/**Componente para ver tus estadisticas, logros y datos del usuario */
 export function Perfil() {
 
     const [datosUsuario, setDatosUsuario] = useState(null);
@@ -18,7 +18,7 @@ export function Perfil() {
     const [nuevaRutaAvatar, setNuevaRutaAvatar] = useState('');
     
 
-    const SERVER_URL = 'http://localhost:2908'; 
+    const SERVER_URL = 'https://proyecto-ajedrez.onrender.com'; 
 
     const recompensasLogros = {
         ganar10Partidas: 'nombreConEstrella',
